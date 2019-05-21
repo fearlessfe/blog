@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on My New Hugo Site</title>
+    <title>Posts on penny&#39;s blogs</title>
     <link>https://fearlessfe.github.io/blog/posts/</link>
-    <description>Recent content in Posts on My New Hugo Site</description>
+    <description>Recent content in Posts on penny&#39;s blogs</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 19 May 2019 10:36:08 +0800</lastBuildDate>
@@ -12,12 +12,16 @@
     
     
     <item>
-      <title>Test</title>
-      <link>https://fearlessfe.github.io/blog/posts/test/</link>
+      <title>事件监听函数</title>
+      <link>https://fearlessfe.github.io/blog/posts/eventlistener/</link>
       <pubDate>Sun, 19 May 2019 10:36:08 +0800</pubDate>
       
-      <guid>https://fearlessfe.github.io/blog/posts/test/</guid>
-      <description>测试第一篇blog</description>
+      <guid>https://fearlessfe.github.io/blog/posts/eventlistener/</guid>
+      <description>毕业后转行为一名前端开发，一共好像就面试过6次。其中就有两次面试的考过手写事件监听函数，第一次不会写，第二次写出来了，但也不太不太完美。在Vue中，每个实例上都有$on,$once,$emit,$off这四个方法，接下来就来看看Vue是怎么实现事件监听函数的。
+ vm.$on 根据官方文档,该方法传入两个参数：事件名和回调函数；其中事件名可以是字符串或字符串数组。自己实现on方法时只会考虑字符串的情况，从没有考虑过数组的情况。废话不多说，接下来看看Vue是如何实现的。
+Vue.prototype.$on = function(event, fn) { const vm = this; if(Array.isArray(event)) { for(let i = 0, l = event.length; i &amp;lt; l; i++ ) { this.$on(event[i], fn) } } else { (vm._events[event] || (vm._events[event] = [])).push(fn) } return vm }  $on方法直接挂载在Vue上，方法中vm是Vue的实例，首先判断event是否为数组，如果是数组，则遍历数组，调用$on。如果不是数组，则直接添加到_events对象中。_events是vm上的一个熟悉，初始化时vm._events = {}。首先判断_events中有没有当前事件名，如果没有，则初始化；如果有，则添加到数组中。添加的过程用if语句改写会更清楚一点。
+if(!vm._events[event]) { vm._events[event] = [] } vm._events[event].push(fn) // 但是Vue的实现更简洁，学到了  vm.$off 说完添加事件的方法，接下来看看移除事件监听器的方法。$off方法和$on的参数一样。但如果没有参数，则移除所有事件；只提供一个参数，则移除该事件下的所有监听器；如果提供两个参数，则移除对应的监听器。
+Vue.prototype.$off = function(event, fn) { const vm = this; // 没有参数，直接清空_events对象 // Object.</description>
     </item>
     
   </channel>

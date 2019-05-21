@@ -3,19 +3,19 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://fearlessfe.github.io/blog/</loc>
-    <lastmod>2019-05-19T10:36:08+08:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://fearlessfe.github.io/blog/posts/</loc>
     <lastmod>2019-05-19T10:36:08+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://fearlessfe.github.io/blog/posts/test/</loc>
+    <loc>https://fearlessfe.github.io/blog/</loc>
+    <lastmod>2019-05-19T10:36:08+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://fearlessfe.github.io/blog/posts/eventlistener/</loc>
     <lastmod>2019-05-19T10:36:08+08:00</lastmod>
   </url>
   
