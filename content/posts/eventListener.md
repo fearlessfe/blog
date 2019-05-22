@@ -76,4 +76,45 @@ Vue.prototype.$off = function(event, fn) {
 ```
 两个参数的情况时，cb.fn === fn，这个判断有点莫名。不要急，看到后面就知道这段代码的作用了。
 
+3. vm.$once
+参数和用法与$on方法一致，但是该方法监听的事件只会执行一次，下面就看看Vue的实现逻辑
+```
+Vue.prototype.$once = function(event, fn) {
+  const vm = this;
+  function on () {
+    vm.$off(event, on);
+    fn.apply(vm, arguments);
+  }
+  on.fn = fn;
+  vm.$on(event, on);
+  return vm;
+}
+```
+$once方法绑定的是内部的on函数，执行on函数时，会先执行$off方法，然后执行输入的fn函数，达到只执行一次的目的。
+这里将on.fn = fn，把fn当中on方法的一个属性，所以在执行$off方法时，会有cb.fn === fn的判断。
+
+4. vm.$emit
+接收多个参数，第一个是事件名，只支持字符串类型，后面的参数都会传给对应的回调函数。
+```
+Vue.prototype.$emit = function () {
+  const vm = this;
+  const _event = Array.prototype.shift(arguments)
+  let cbs = vm._events[_event]
+  if(cbs) {
+    const args = Array.from(arguments);
+    for(let i = 0; l = args.length; i < l; i++) {
+      try{
+        cbs[i].apply(vm,args)
+      } catch (e) {
+        handleError(e, vm, `event handler for ${event}`)
+      }
+    }
+  }
+  return vm
+}
+```
+上面并不是完整的源码，在参数处理上，本人做了一点修改，arguments第一个参数为event,剩下的都是回调函数的参数，所以用shift方法处理。
+
+一个简单的事件监听函数，框架的源码实现的很完整，各种边界情况都做了处理，值得学习。同时我还注意到，源码中遍历的实现都是用的for循环，并没有用高级一点forEach,map等方法，这是为什么呢？这个我也不是太明白，可能是为了更好的性能吧，毕竟高级的方法底层也是用的for循环。
+
 [1]: https://cn.vuejs.org/v2/api/#vm-on
