@@ -1,6 +1,6 @@
 baseURL: https://fearlessfe.github.io/blog/
 theme: pure
-title: Pure theme for Hugo
+title: fearlessfe's blog
 copyright: CC BY 4.0 CN
 defaultContentLanguage: en  # en/zh/...
 footnoteReturnLinkContents: ↩
@@ -102,7 +102,7 @@ params:
     gravatar: # Gravatar email address, if you enable Gravatar, your avatar config will be overriden
     author: pengzhen
     author_title: Software Engineer
-    author_description: Good Good Study, Day Day Up~
+    author_description: Good judgement comes from experience, and experience comes from bad judgement.
     location: Wuhan, China
     follow: https://github.com/fearlessfe
     # Social Links
