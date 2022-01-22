@@ -57,15 +57,15 @@ menu:
       url: /tags/
       weight: 4
 
-    - identifier: about
-      name: About
-      title: About
-      url: /about/
-      weight: 5
+    # - identifier: about
+    #   name: About
+    #   title: About
+    #   url: /about/
+    #   weight: 5
 
 
 params:
-  since: 2017
+  since: 2022
   dateFormatToUse: "2006-01-02"
   enablePostCopyright: true
   copyright_link: http://creativecommons.org/licenses/by/4.0/deed.zh
@@ -75,7 +75,7 @@ params:
   # Icon Reference: http://blog.cofess.com/hexo-theme-pure/iconfont/demo_fontclass.html
   enableMathJax: true #Enable mathjax support, to use mathematical notations
   highlightjs:
-    langs: ["python", "javascript"] # refer to http://staticfile.org/, search highlight.js, already have highlight.min.js
+    langs: ["golang", "javascript"] # refer to http://staticfile.org/, search highlight.js, already have highlight.min.js
 
   tag_cloud:
     min: 8
@@ -100,15 +100,15 @@ params:
     enabled: true # Whether to show profile bar
     avatar: avatar.png
     gravatar: # Gravatar email address, if you enable Gravatar, your avatar config will be overriden
-    author: xiaoheiAh
-    author_title: author title
+    author: pengzhen
+    author_title: Software Engineer
     author_description: Good Good Study, Day Day Up~
-    location: Shanghai, China
-    follow: https://github.com/xiaoheiAh
+    location: Wuhan, China
+    follow: https://github.com/fearlessfe
     # Social Links
     social:
       links:
-        github: https://github.com/xiaoheiAh
+        github: https://github.com/fearlessfe
         # weibo: http://weibo.com/{yourid}
         # twitter: https://twitter.com/
         # facebook: /
