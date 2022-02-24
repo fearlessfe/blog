@@ -1,0 +1,471 @@
+<!doctype html><html lang=en>
+<head>
+<title>
+The Node.js Event Loop, Timers and process.nextTick() - fearlessfe's blog
+</title>
+<meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge,chrome=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui">
+<meta name=renderer content="webkit">
+<meta http-equiv=cache-control content="no-transform">
+<meta http-equiv=cache-control content="no-siteapp">
+<meta name=apple-mobile-web-app-capable content="yes">
+<meta name=apple-mobile-web-app-status-bar-style content="black">
+<meta name=format-detection content="telephone=no,email=no,adress=no">
+<meta name=theme-color content="#000000">
+<meta http-equiv=window-target content="_top">
+<meta name=description content="为什么要写这篇文章 有一段时间 nodejs 工作经历，面试总是被问到 Event Loop,虽然看过官网上的文章，奈何总是记不住，面试也答不上来。因此，写这篇文章来加">
+<meta name=generator content="Hugo 0.92.2 with theme pure">
+<title>The Node.js Event Loop, Timers and process.nextTick() - fearlessfe's blog</title>
+<link rel=stylesheet href=https://fearlessfe.github.io/blog/css/style.min.e64d754037c0ee0ec4e20ab1d6f07740ace61729bc03850559b8caa21ae4a597.css>
+<link rel=stylesheet href=https://cdn.staticfile.org/highlight.js/9.15.10/styles/github.min.css async>
+<link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css async>
+<meta property="og:title" content="The Node.js Event Loop, Timers and process.nextTick()">
+<meta property="og:description" content="为什么要写这篇文章 有一段时间 nodejs 工作经历，面试总是被问到 Event Loop,虽然看过官网上的文章，奈何总是记不住，面试也答不上来。因此，写这篇文章来加">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fearlessfe.github.io/blog/2022/02/event-loop/"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2022-02-23T20:59:19+08:00">
+<meta property="article:modified_time" content="2022-02-23T20:59:19+08:00">
+<meta itemprop=name content="The Node.js Event Loop, Timers and process.nextTick()">
+<meta itemprop=description content="为什么要写这篇文章 有一段时间 nodejs 工作经历，面试总是被问到 Event Loop,虽然看过官网上的文章，奈何总是记不住，面试也答不上来。因此，写这篇文章来加"><meta itemprop=datePublished content="2022-02-23T20:59:19+08:00">
+<meta itemprop=dateModified content="2022-02-23T20:59:19+08:00">
+<meta itemprop=wordCount content="2836">
+<meta itemprop=keywords content><meta name=twitter:card content="summary">
+<meta name=twitter:title content="The Node.js Event Loop, Timers and process.nextTick()">
+<meta name=twitter:description content="为什么要写这篇文章 有一段时间 nodejs 工作经历，面试总是被问到 Event Loop,虽然看过官网上的文章，奈何总是记不住，面试也答不上来。因此，写这篇文章来加"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]-->
+</head>
+<body class="main-center theme-black" itemscope itemtype=http://schema.org/WebPage><header class=header itemscope itemtype=http://schema.org/WPHeader>
+<div class=slimContent>
+<div class=navbar-header>
+<div class="profile-block text-center">
+<a id=avatar href=https://github.com/fearlessfe target=_blank>
+<img class="img-circle img-rotate" src="https://avatars.githubusercontent.com/u/21964308?v=4" width=200 height=200>
+</a>
+<h2 id=name class="hidden-xs hidden-sm">pengzhen</h2>
+<h3 id=title class="hidden-xs hidden-sm hidden-md">Software Engineer</h3>
+<small id=location class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i>Wuhan, China</small>
+</div><div class=search id=search-form-wrap>
+<form class="search-form sidebar-form">
+<div class=input-group>
+<input type=text class="search-form-input form-control" placeholder=Search>
+<span class=input-group-btn>
+<button type=submit class="search-form-submit btn btn-flat" onclick=return!1><i class="icon icon-search"></i></button>
+</span>
+</div>
+<div class=ins-search>
+<div class=ins-search-mask></div>
+<div class=ins-search-container>
+<div class=ins-input-wrapper>
+<input type=text class=ins-search-input placeholder="Type something..." x-webkit-speech>
+<button type=button class="close ins-close ins-selectable" data-dismiss=modal aria-label=Close><span aria-hidden=true>×</span></button>
+</div>
+<div class=ins-section-wrapper>
+<div class=ins-section-container></div>
+</div>
+</div>
+</div>
+</form>
+</div>
+<button class="navbar-toggle collapsed" type=button data-toggle=collapse data-target=#main-navbar aria-controls=main-navbar aria-expanded=false>
+<span class=sr-only>Toggle navigation</span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+</div>
+<nav id=main-navbar class="collapse navbar-collapse" itemscope itemtype=http://schema.org/SiteNavigationElement role=navigation>
+<ul class="nav navbar-nav main-nav">
+<li class="menu-item menu-item-home">
+<a href=/blog/>
+<i class="icon icon-home-fill"></i>
+<span class=menu-title>Home</span>
+</a>
+</li>
+<li class="menu-item menu-item-archives">
+<a href=/blog/posts/>
+<i class="icon icon-archives-fill"></i>
+<span class=menu-title>Archives</span>
+</a>
+</li>
+<li class="menu-item menu-item-categories">
+<a href=/blog/categories/>
+<i class="icon icon-folder"></i>
+<span class=menu-title>Categories</span>
+</a>
+</li>
+<li class="menu-item menu-item-tags">
+<a href=/blog/tags/>
+<i class="icon icon-tags"></i>
+<span class=menu-title>Tags</span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</header>
+<aside class=sidebar itemscope itemtype=http://schema.org/WPSideBar>
+<div class=slimContent>
+<div class=widget>
+<h3 class=widget-title>Board</h3>
+<div class=widget-body>
+<div id=board>
+<div class=content><p>enjoy~</p>
+</div>
+</div>
+</div>
+</div>
+<div class=widget>
+<h3 class=widget-title> Tags</h3>
+<div id=tag-cloud-list class=widget-body>
+</div>
+<script>document.onreadystatechange=()=>{document.readyState==='complete'&&tagCloud('#tag-cloud-list a',8,20)};function tagCloud(c,d,e){let b=0,a=0;$(c).each(function(){let c=Number($(this).attr("rel"));b<c&&(b=c),(a>c||a==0)&&(a=c)});let f=(e-d)/(b-a);$(c).each(function(){let b=$(this).attr("rel")-a;$(this).css({"font-size":d+b*f+'px'})})}</script>
+</div>
+<div class=widget>
+<h3 class=widget-title> Categories</h3>
+<div class=widget-body>
+<ul class=category-list>
+</ul>
+</div>
+</div>
+<div class=widget>
+<h3 class=widget-title> Tags</h3>
+<div class=widget-body>
+<ul class=tag-list>
+</ul>
+</div>
+</div>
+<div class=widget>
+<h3 class=widget-title>Recent Posts</h3>
+<div class=widget-body>
+<ul class="recent-post-list list-unstyled no-thumbnail">
+<li>
+<div class=item-inner>
+<p class=item-title>
+<a href=https://fearlessfe.github.io/blog/2022/02/event-loop/ class=title>The Node.js Event Loop, Timers and process.nextTick()</a>
+</p>
+<p class=item-date>
+<time datetime="2022-02-23 20:59:19 +0800 +0800" itemprop=datePublished>2022-02-23</time>
+</p>
+</div>
+</li>
+<li>
+<div class=item-inner>
+<p class=item-title>
+<a href=https://fearlessfe.github.io/blog/2022/01/mutex/ class=title>Golang Mutex 源码解析</a>
+</p>
+<p class=item-date>
+<time datetime="2022-01-22 13:12:08 +0800 +0800" itemprop=datePublished>2022-01-22</time>
+</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</aside>
+<aside class="sidebar sidebar-toc collapse" id=collapseToc itemscope itemtype=http://schema.org/WPSideBar>
+<div class=slimContent>
+<h4 class=toc-title>Catalogue</h4>
+<nav id=toc class="js-toc toc">
+</nav>
+</div>
+</aside>
+<main class=main role=main><div class=content>
+<article id=- class="article article-type-" itemscope itemtype=http://schema.org/BlogPosting>
+<div class=article-header>
+<h1 itemprop=name>
+<a class=article-title href=/blog/2022/02/event-loop/>The Node.js Event Loop, Timers and process.nextTick()</a>
+</h1>
+<div class=article-meta>
+<span class=article-date>
+<i class="icon icon-calendar-check"></i>&nbsp;
+<a href=https://fearlessfe.github.io/blog/2022/02/event-loop/ class=article-date>
+<time datetime="2022-02-23 20:59:19 +0800 +0800" itemprop=datePublished>2022-02-23</time>
+</a>
+</span>
+<span class="post-wordcount hidden-xs" itemprop=wordCount>Word Count: 2836 words</span>
+<span class="post-readcount hidden-xs" itemprop=timeRequired>Read Time: 6 minutes </span>
+</div>
+</div>
+<div class="article-entry marked-body js-toc-content" itemprop=articleBody>
+<h3 id=为什么要写这篇文章>为什么要写这篇文章</h3>
+<p>有一段时间 <code>nodejs</code> 工作经历，面试总是被问到 <code>Event Loop</code>,虽然看过官网上的文章，奈何总是记不住，面试也答不上来。因此，写这篇文章来加深印象。原文请👇<a href=https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/>这里</a></p>
+<h3 id=什么是-event-loop>什么是 <code>Event Loop</code></h3>
+<p>虽然 <code>Javascript</code> 是单线程的，但是 <code>Event Loop</code> 让 <code>Nodejs</code> 能够执行非阻塞的 I/O。</p>
+<p>现代内核都是多线程的，它们可在后台执行多个操作。但其中一个操作完成后，内核通知 Nodejs 以便将相应的回调添加到轮询队列，最后回调会被执行。</p>
+<h3 id=event-loop简介><code>Event Loop</code>简介</h3>
+<p>当 Nodejs 运行时，它会初始化事件循环，执行输入的脚本，脚本中可能会调用异步的 API，timer 函数或 <code>process.nextTick()</code>,然后开始事件循环。</p>
+<p>下图（来源于<a href=https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/>原文</a>）简单的描述了事件循环操作顺序。</p>
+<p>┌───────────────────────────┐
+┌─>│ timers │
+│ └─────────────┬─────────────┘
+│ ┌─────────────┴─────────────┐
+│ │ pending callbacks │
+│ └─────────────┬─────────────┘
+│ ┌─────────────┴─────────────┐
+│ │ idle, prepare │
+│ └─────────────┬─────────────┘ ┌───────────────┐
+│ ┌─────────────┴─────────────┐ │ incoming: │
+│ │ poll │&lt;─────┤ connections, │
+│ └─────────────┬─────────────┘ │ data, etc. │
+│ ┌─────────────┴─────────────┐ └───────────────┘
+│ │ check │
+│ └─────────────┬─────────────┘
+│ ┌─────────────┴─────────────┐
+└──┤ close callbacks │
+└───────────────────────────┘</p>
+<blockquote>
+<p>图中每个盒子代表事件循环中一个<code>阶段</code></p>
+</blockquote>
+<p>每个阶段都是一个队列，按照 FIFO 的方式执行回调函数。事件循环进入其中一个阶段后，首先会执行该阶段特定的操作。然后执行该阶段队列中的回调，知道队列中回调全部执行完或者达到最大的回调限制，然后事件循环进入下一个阶段。</p>
+<p>由于这些操作可能会产生新的事件，而轮询阶段（poll phase）新的事件由内核加入到队列，因此处理轮询事件时也会有新的事件加入到队列中。因此，长时间运行的回调会让轮询阶段的时间远超过计时器的阈值。</p>
+<h3 id=阶段概览>阶段概览</h3>
+<ul>
+<li>timers: 这个阶段执行 <code>setTimeout()</code> 和 <code>setInterval()</code> 的回调</li>
+<li>pending callbacks：执行推迟到下一个循环的 I/O 回调</li>
+<li>idle,prepare: 仅供内部使用</li>
+<li>poll（轮询）: 检索新的 I/O 事件；执行 I/O 相关的回调（几乎所有的回调，除了关闭回调，定时器调度的回调和<code>setImmediate()</code>）,节点会在适当的时候阻塞。</li>
+<li>check：<code>setImmediate()</code>的回调在这里执行。</li>
+<li>close callbacks: 关闭的回调，比如<code>socket.on('close',...)</code></li>
+</ul>
+<p>在事件循环之间，Nodejs 会检查它是否正在等待异步 I/O 或计时器。如果没有，则退出。（这里退出应该是指退出 nodejs 程序）。</p>
+<h3 id=阶段详情>阶段详情</h3>
+<h4 id=timers>timers</h4>
+<p>计时器可以指定一个阈值，到达阈值后执行回调，而不是决定回调执行的确切时间。计时器的回调会在指定的时间过后尽可能早的执行，但是回调的执行可能会延迟。</p>
+<blockquote>
+<p>轮询阶段控制计时器回调的执行</p>
+</blockquote>
+<p>举个例子，定时器在100ms后执行回调，然后一个异步读取文件会花 95ms</p>
+<pre><code class=language-nodejs>const fs = require('fs');
+
+function someAsyncOperation(callback) {
+  fs.readFile('/path/to/file', callback)
+}
+
+const timeoutScheduled = Date.now();
+
+setTimeout(() =&gt; {
+  const delay = Date.now() - timeoutScheduled
+  
+  console.log(`${delay}ms have passed since I was scheduled`)
+}, 100)
+
+// someAsyncOperation takes 95ms
+someAsyncOperation(() =&gt; {
+  const startCallback = Date.now()
+
+  // do something will take 10ms
+  while(Date.now() - startCallback &lt; 10) {
+    // do nothing
+  }
+})
+</code></pre>
+<p>当事件循环进入轮询阶段，此时队列是空的，所以会等待一直达到最近的计时器阈值。
+95ms 后，读取文件的操作完成，回调进入轮询阶段的队列，然后花 10ms 执行回调。执行完成后，队列为空，这时候到达了 100ms 的阈值，因此会回到 timer 阶段执行定时器的回调。所以定时器的回调会在 105ms 后被执行，而不是 100ms。</p>
+<blockquote>
+<p>为了防止轮询阶段过长使得事件循环陷入饥饿，libuv 对轮询阶段设置处理事件的最大值</p>
+</blockquote>
+<h4 id=pending-callbacks>pending callbacks</h4>
+<p>这个阶段执行系统操作的回调，比如 TCP error。比如一个 TCP 连接收到了 <code>ECONNREFUSED</code>,一些 *nix 的系统想要 report 这个错误。这些事件的回调会在这个阶段执行。</p>
+<h4 id=idle-prepare>idle prepare</h4>
+<p>这个阶段仅供内部使用</p>
+<h4 id=poll轮询>poll(轮询)</h4>
+<p>轮询阶段主要有两个功能：</p>
+<ol>
+<li>计算应该阻塞和轮询 I/O 的时间</li>
+<li>处理轮询队列的事件</li>
+</ol>
+<p>当事件循环进入 轮询阶段并且没有定时器，将发生以下两件事之一：</p>
+<ul>
+<li>如果轮询队列不是空的，那事件循环会按顺序同步的执行队列中的事件，知道队列为空或者达到最大的事件限制</li>
+<li>如果队列为空，则可能发生下列两件事之一：
+<ul>
+<li>如果有 <code>setImmediate()</code> 事件，事件循环会结束轮询阶段，进入 check 阶段，执行该阶段的回调。</li>
+<li>如果没有 <code>setImmediate()</code> 事件，事件循环会等待回调被加入到队列，然后立即执行回调</li>
+</ul>
+</li>
+</ul>
+<p>如果轮询队列为空，事件循环会检查是否达到定时器的阈值。如果有，事件循环会回到 timer 阶段，执行定时器的回调。</p>
+<h4 id=check>check</h4>
+<p>这个阶段是在轮询阶段结束后执行该阶段的回调。</p>
+<p><code>setImmediate()</code>是一个特别的定时器，在单独的阶段执行。</p>
+<p>一般来说，代码执行后，事件循环会最终达到轮询阶段，等待新来的链接，请求等。如果有 <code>setImmediate()</code> 而且轮询阶段处于空闲状态，轮询阶段会结束，然后进入 check 阶段执行 <code>setImmediate()</code> 的回调。</p>
+<h4 id=close-callback>close callback</h4>
+<p>如果套接字或句柄被突然关闭（例如 socket.destroy()）,此阶段会 emit &lsquo;close&rsquo; 事件。否则会通过 process.nextTick()</p>
+<h3 id=setimmediate-vs-settimeout>setImmediate() VS setTimeout()</h3>
+<p>setImmediate() 和 setTimeout() 比较类似，但是根据调用时间不同而有不同的表现。</p>
+<ul>
+<li>setImmediate() 设计为 轮询阶段结束后调用</li>
+<li>setTimeout() 达到设定的阈值后调用</li>
+</ul>
+<p>如果两者都在主模块中调用，那么两者的顺序是不固定的，两者顺序取决于处理器的性能。</p>
+<pre><code class=language-nodejs>setTimeout(() =&gt; {
+  console.log('timeout)
+}, 0)
+
+setImmediate(() =&gt; {
+  console.log('immediate)
+}, 0)
+</code></pre>
+<p>如果在 I/O 事件中调用，则 setImmediate 总是先执行</p>
+<pre><code class=language-nodejs>const fs = require('fs');
+
+fs.readFile(&quot;&quot;, () =&gt; {
+  setTimeout(() =&gt; {
+    console.log('timeout)
+  }, 0)
+
+  setImmediate(() =&gt; {
+    console.log('immediate)
+  }, 0)
+})
+
+</code></pre>
+<h3 id=processnexttick>process.nextTick()</h3>
+<h4 id=理解-nexttick>理解 nextTick</h4>
+<p>process.nextTick() 没有在图中展示，即使这是一个异步的 API。因为 nextTick 不属于事件循环。</p>
+<p>在某个阶段的任意时刻调用 process.nextTick()，它的回调会在事件循环继续之前执行。这会出现一些坏的情况，比如在 process.nextTick() 递归调用 process.nextTick()，这会使得事件循环无法继续。</p>
+<h4 id=为什么需要-nexttick>为什么需要 nextTick</h4>
+<p>nextTick 一部分的设计理念是 API 应该始终是异步的，即使它不是。以下面的代码为例</p>
+<pre><code class=language-nodejs>function apiCall(arg, callback) {
+  if (typeof arg != 'string') {
+    return process.nextTick(callback, new TypeError('args should be string'))
+  }
+}
+</code></pre>
+<p>这样回调会在所有用户的 code 执行完毕后，在进入事件循环之前才执行。</p>
+<p>下面是一个真正的例子</p>
+<pre><code class=language-nodejs>const server = net.createServer(() =&gt; {}).listen(8080)
+server.on('listening', () =&gt; {})
+</code></pre>
+<p>只有绑定端口后， &lsquo;listening&rsquo; 回调才会执行。但问题是那时候 &lsquo;listening&rsquo; 回调还没设置。
+所以 &lsquo;listening&rsquo; 回调放在 nextTick() 中。</p>
+<h3 id=processnexttick-vs-setimmediate>process.nextTick() VS setImmediate()</h3>
+<p>这两者比较类似，但是名字有点让人困惑</p>
+<ul>
+<li>process.nextTick() 在当前阶段执行</li>
+<li>setImmediate() 在时间循环中执行</li>
+</ul>
+<blockquote>
+<p>建议开发者在所有情况下都使用 setImmediate()</p>
+</blockquote>
+<h3 id=为什么需要-processnexttick>为什么需要 process.nextTick()</h3>
+<p>主要有以下两个原因</p>
+<ol>
+<li>允许用户处理错误，清理不需要的资源或在事件循环之前再次尝试请求</li>
+<li>有时，需要允许回调在调用栈解除后但在事件循环之前调用</li>
+</ol>
+<p>一个符合用户期望的例子如下</p>
+<pre><code class=language-nodejs>const server = net.createServer();
+server.on('connection', (conn) =&gt; {})
+
+server.listen(8000)
+server.on('listening', () =&gt; {})
+</code></pre>
+<p>listen() 在时间循环开始时允许，如果 &lsquo;listening&rsquo; 函数放在 setImmediate 中，那么有一定概率在轮询阶段收到新的请求的时候，&lsquo;listening&rsquo; 回调还没有注册。</p>
+<p>另一个例子是在构造函数中 emit 事件</p>
+<pre><code class=language-nodejs>const EventEmitter =  require('events')
+const util = require('util')
+
+function MyEmitter() {
+  EventEmitter.call(this)
+  this.emit('event)
+}
+
+util.inherits(MyEmitter, EventEmitter)
+
+const myEmitter = new MyEmitter();
+myEmitter.on('event', () =&gt; {
+  console.log('event occurred!')
+})
+</code></pre>
+<p>上诉代码中的事件不会触发，因为脚本不会处理到为事件分配回调的地方。如果将 this.emit(&lsquo;event) 放入 process.nextTick() 中执行，则会触发 &lsquo;event&rsquo; 事件。</p>
+</div>
+<div class=article-footer>
+<blockquote class=mt-2x>
+<ul class="post-copyright list-unstyled">
+<li class="post-copyright-link hidden-xs">
+<strong>Permalink: </strong>
+<a href=https://fearlessfe.github.io/blog/2022/02/event-loop/ title="The Node.js Event Loop, Timers and process.nextTick()" target=_blank rel=external>https://fearlessfe.github.io/blog/2022/02/event-loop/</a>
+</li>
+<li class=post-copyright-license>
+<strong>License: </strong>
+<a href=http://creativecommons.org/licenses/by/4.0/deed.zh target=_blank rel=external>CC BY 4.0 CN</a>
+</li>
+</ul>
+</blockquote>
+<div class="panel panel-default panel-badger">
+<div class=panel-body>
+<figure class=media>
+<div class=media-left>
+<a href=https://github.com/fearlessfe target=_blank class="img-burn thumb-sm visible-lg">
+<img src="https://avatars.githubusercontent.com/u/21964308?v=4" class="img-rounded w-full" alt>
+</a>
+</div>
+<div class=media-body>
+<h3 class=media-heading><a href=https://github.com/fearlessfe target=_blank><span class=text-dark>pengzhen</span><small class=ml-1x>Software Engineer</small></a></h3>
+<div>Good judgement comes from experience, and experience comes from bad judgement.</div>
+</div>
+</figure>
+</div>
+</div>
+</div>
+</article>
+</div><nav class="bar bar-footer clearfix" data-stick-bottom>
+<div class=bar-inner>
+<ul class="pager pull-left">
+<li class=prev>
+<a href=https://fearlessfe.github.io/blog/2022/01/mutex/ title="Golang Mutex 源码解析"><i class="icon icon-angle-left" aria-hidden=true></i><span>&nbsp;&nbsp;Older</span></a>
+</li>
+<li class=toggle-toc>
+<a class="toggle-btn collapsed" data-toggle=collapse href=#collapseToc aria-expanded=false title=Catalogue role=button>
+<span>[&nbsp;</span><span>Catalogue</span>
+<i class="text-collapsed icon icon-anchor"></i>
+<i class="text-in icon icon-close"></i>
+<span>]</span>
+</a>
+</li>
+</ul>
+<div class=bar-right>
+<div class=share-component data-sites=weibo,qq,wechat,facebook,twitter data-mobile-sites=weibo,qq,qzone></div>
+</div>
+</div>
+</nav>
+</main><footer class=footer itemscope itemtype=http://schema.org/WPFooter>
+<ul class=social-links>
+<li><a href=https://github.com/fearlessfe target=_blank title=github data-toggle=tooltip data-placement=top>
+<i class="icon icon-github"></i></a></li>
+<li><a href=https://fearlessfe.github.io/index.xml target=_blank title=rss data-toggle=tooltip data-placement=top>
+<i class="icon icon-rss"></i></a></li>
+</ul>
+<div class=copyright>
+&copy;2022 -
+2022
+<div class=publishby>
+Theme by <a href=https://github.com/xiaoheiAh target=_blank> xiaoheiAh </a>base on<a href=https://github.com/xiaoheiAh/hugo-theme-pure target=_blank> pure</a>.
+</div>
+</div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type=text/x-mathjax-config>
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
+</script>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script>window.jQuery||document.write('<script src="js/jquery.min.js"><\/script>')</script>
+<script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/highlight.min.js></script>
+<script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/languages/golang.min.js defer></script>
+<script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/languages/javascript.min.js defer></script><script>hljs.configure({tabReplace:'    ',classPrefix:''}),hljs.initHighlightingOnLoad()</script>
+<script src=https://fearlessfe.github.io/blog/js/application.min.a94ab19cb63a95c8d7fbd7b85cab3ddeea8c369bdf75b9cab6708787ead123af.js></script>
+<script src=https://fearlessfe.github.io/blog/js/plugin.min.19c5bcb2fb0789ab4f2b7834e5ceb5e92635645605bab902c1024b25f1502364.js></script>
+<script>(function(a){var b={TRANSLATION:{POSTS:'Posts',PAGES:'Pages',CATEGORIES:'Categories',TAGS:'Tags',UNTITLED:'(Untitled)'},ROOT_URL:'https://fearlessfe.github.io/blog/',CONTENT_URL:'https://fearlessfe.github.io/blog//searchindex.json '};a.INSIGHT_CONFIG=b})(window)</script>
+<script type=text/javascript src=https://fearlessfe.github.io/blog/js/insight.min.4a2d52de4bfff73e0c688404fe3d17c9a3ae12d9888e1e1ac9c690e4890de2ded50fe55f2b819c2ba55435a76f396f3ea6805765f0b0af5635cdf74ea459eab0.js defer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js></script>
+<script>tocbot.init({tocSelector:'.js-toc',contentSelector:'.js-toc-content',headingSelector:'h1, h2, h3',hasInnerContainers:!0})</script>
+</body>
+</html>
