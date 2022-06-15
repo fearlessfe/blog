@@ -309,3 +309,8 @@ type Mempool interface {
 ## core/blockchain
 
 ### v0
+
+
+## core/consensus
+
+其中的 state 代表共识的状态机
