@@ -1,0 +1,338 @@
+<!doctype html><html lang=en><head><title>Rust Traits - fearlessfe's blog</title><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui"><meta name=renderer content="webkit"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="black"><meta name=format-detection content="telephone=no,email=no,adress=no"><meta name=theme-color content="#000000"><meta http-equiv=window-target content="_top"><meta name=description content="范型，traits和生命周期 范型 范型可以减少重复代码。 以下例子是从 i32 和 char 类型的 vec 中找到最大值。 fn largest_i32(list: &amp;amp;[i32]) -&amp;gt; i32 { let mut largest = list[0]; for &amp;amp;item in list { if item &amp;gt; largest { largest ="><meta name=generator content="Hugo 0.101.0 with theme pure"><title>Rust Traits - fearlessfe's blog</title><link rel=stylesheet href=https://fearlessfe.github.io/blog/css/style.min.e64d754037c0ee0ec4e20ab1d6f07740ace61729bc03850559b8caa21ae4a597.css><link rel=stylesheet href=https://cdn.staticfile.org/highlight.js/9.15.10/styles/github.min.css async><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css async><meta property="og:title" content="Rust Traits"><meta property="og:description" content="范型，traits和生命周期 范型 范型可以减少重复代码。 以下例子是从 i32 和 char 类型的 vec 中找到最大值。 fn largest_i32(list: &[i32]) -> i32 { let mut largest = list[0]; for &item in list { if item > largest { largest ="><meta property="og:type" content="article"><meta property="og:url" content="https://fearlessfe.github.io/blog/2022/06/rust-traits/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-06-17T15:36:40+08:00"><meta property="article:modified_time" content="2022-06-17T15:36:40+08:00"><meta itemprop=name content="Rust Traits"><meta itemprop=description content="范型，traits和生命周期 范型 范型可以减少重复代码。 以下例子是从 i32 和 char 类型的 vec 中找到最大值。 fn largest_i32(list: &[i32]) -> i32 { let mut largest = list[0]; for &item in list { if item > largest { largest ="><meta itemprop=datePublished content="2022-06-17T15:36:40+08:00"><meta itemprop=dateModified content="2022-06-17T15:36:40+08:00"><meta itemprop=wordCount content="1514"><meta itemprop=keywords content><meta name=twitter:card content="summary"><meta name=twitter:title content="Rust Traits"><meta name=twitter:description content="范型，traits和生命周期 范型 范型可以减少重复代码。 以下例子是从 i32 和 char 类型的 vec 中找到最大值。 fn largest_i32(list: &[i32]) -> i32 { let mut largest = list[0]; for &item in list { if item > largest { largest ="><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body class="main-center theme-black" itemscope itemtype=http://schema.org/WebPage><header class=header itemscope itemtype=http://schema.org/WPHeader><div class=slimContent><div class=navbar-header><div class="profile-block text-center"><a id=avatar href=https://github.com/fearlessfe target=_blank><img class="img-circle img-rotate" src="https://avatars.githubusercontent.com/u/21964308?v=4" width=200 height=200></a><h2 id=name class="hidden-xs hidden-sm">pengzhen</h2><h3 id=title class="hidden-xs hidden-sm hidden-md">Software Engineer</h3><small id=location class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i>Wuhan, China</small></div><div class=search id=search-form-wrap><form class="search-form sidebar-form"><div class=input-group><input type=text class="search-form-input form-control" placeholder=Search>
+<span class=input-group-btn><button type=submit class="search-form-submit btn btn-flat" onclick=return!1><i class="icon icon-search"></i></button></span></div><div class=ins-search><div class=ins-search-mask></div><div class=ins-search-container><div class=ins-input-wrapper><input type=text class=ins-search-input placeholder="Type something..." x-webkit-speech>
+<button type=button class="close ins-close ins-selectable" data-dismiss=modal aria-label=Close><span aria-hidden=true>×</span></button></div><div class=ins-section-wrapper><div class=ins-section-container></div></div></div></div></form></div><button class="navbar-toggle collapsed" type=button data-toggle=collapse data-target=#main-navbar aria-controls=main-navbar aria-expanded=false>
+<span class=sr-only>Toggle navigation</span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span></button></div><nav id=main-navbar class="collapse navbar-collapse" itemscope itemtype=http://schema.org/SiteNavigationElement role=navigation><ul class="nav navbar-nav main-nav"><li class="menu-item menu-item-home"><a href=/blog/><i class="icon icon-home-fill"></i>
+<span class=menu-title>Home</span></a></li><li class="menu-item menu-item-archives"><a href=/blog/posts/><i class="icon icon-archives-fill"></i>
+<span class=menu-title>Archives</span></a></li><li class="menu-item menu-item-categories"><a href=/blog/categories/><i class="icon icon-folder"></i>
+<span class=menu-title>Categories</span></a></li><li class="menu-item menu-item-tags"><a href=/blog/tags/><i class="icon icon-tags"></i>
+<span class=menu-title>Tags</span></a></li></ul></nav></div></header><aside class=sidebar itemscope itemtype=http://schema.org/WPSideBar><div class=slimContent><div class=widget><h3 class=widget-title>Board</h3><div class=widget-body><div id=board><div class=content><p>enjoy~</p></div></div></div></div><div class=widget><h3 class=widget-title>Tags</h3><div id=tag-cloud-list class=widget-body></div><script>document.onreadystatechange=()=>{document.readyState==="complete"&&tagCloud("#tag-cloud-list a",8,20)};function tagCloud(e,t,n){let o=0,s=0;$(e).each(function(){let e=Number($(this).attr("rel"));o<e&&(o=e),(s>e||s==0)&&(s=e)});let i=(n-t)/(o-s);$(e).each(function(){let e=$(this).attr("rel")-s;$(this).css({"font-size":t+e*i+"px"})})}</script></div><div class=widget><h3 class=widget-title>Categories</h3><div class=widget-body><ul class=category-list></ul></div></div><div class=widget><h3 class=widget-title>Tags</h3><div class=widget-body><ul class=tag-list></ul></div></div><div class=widget><h3 class=widget-title>Recent Posts</h3><div class=widget-body><ul class="recent-post-list list-unstyled no-thumbnail"><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-traits/ class=title>Rust Traits</a></p><p class=item-date><time datetime="2022-06-17 15:36:40 +0800 +0800" itemprop=datePublished>2022-06-17</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-collections/ class=title>Rust Collections</a></p><p class=item-date><time datetime="2022-06-16 23:09:25 +0800 +0800" itemprop=datePublished>2022-06-16</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-struct/ class=title>Rust Struct</a></p><p class=item-date><time datetime="2022-06-16 17:19:16 +0800 +0800" itemprop=datePublished>2022-06-16</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-ownership/ class=title>Rust Ownership</a></p><p class=item-date><time datetime="2022-06-16 14:35:42 +0800 +0800" itemprop=datePublished>2022-06-16</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-basic/ class=title>Rust Basic</a></p><p class=item-date><time datetime="2022-06-15 20:21:04 +0800 +0800" itemprop=datePublished>2022-06-15</time></p></div></li></ul></div></div></div></aside><aside class="sidebar sidebar-toc collapse" id=collapseToc itemscope itemtype=http://schema.org/WPSideBar><div class=slimContent><h4 class=toc-title>Catalogue</h4><nav id=toc class="js-toc toc"></nav></div></aside><main class=main role=main><div class=content><article id=- class="article article-type-" itemscope itemtype=http://schema.org/BlogPosting><div class=article-header><h1 itemprop=name><a class=article-title href=/blog/2022/06/rust-traits/>Rust Traits</a></h1><div class=article-meta><span class=article-date><i class="icon icon-calendar-check"></i>&nbsp;
+<a href=https://fearlessfe.github.io/blog/2022/06/rust-traits/ class=article-date><time datetime="2022-06-17 15:36:40 +0800 +0800" itemprop=datePublished>2022-06-17</time></a></span>
+<span class="post-wordcount hidden-xs" itemprop=wordCount>Word Count: 1514 words</span>
+<span class="post-readcount hidden-xs" itemprop=timeRequired>Read Time: 4 minutes</span></div></div><div class="article-entry marked-body js-toc-content" itemprop=articleBody><h2 id=范型traits和生命周期>范型，traits和生命周期</h2><h3 id=范型>范型</h3><p>范型可以减少重复代码。</p><p>以下例子是从 i32 和 char 类型的 vec 中找到最大值。</p><pre><code class=language-rust>fn largest_i32(list: &amp;[i32]) -&gt; i32 {
+  let mut largest = list[0];
+
+  for &amp;item in list {
+    if item &gt; largest {
+      largest = item;
+    }
+  }
+  largest
+}
+
+fn largest_i32(list: &amp;[char]) -&gt; char {
+  let mut largest = list[0];
+
+  for &amp;item in list {
+    if item &gt; largest {
+      largest = item;
+    }
+  }
+  largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest_i32(&amp;number_list);
+    println!(&quot;The largest number is {}&quot;, result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest_char(&amp;char_list);
+    println!(&quot;The largest char is {}&quot;, result);
+}
+</code></pre><p>使用范型重新定义函数</p><pre><code class=language-rust>fn largest&lt;T&gt;(list: &amp;[T]) -&gt; T {
+  let mut largest = list[0];
+
+  for &amp;item in list {
+    if item &gt; largest {
+      largest = item;
+    }
+  }
+  largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&amp;number_list);
+    println!(&quot;The largest number is {}&quot;, result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&amp;char_list);
+    println!(&quot;The largest char is {}&quot;, result);
+}
+</code></pre><p>上面的代码编译会报错，因为编译器无法确定类型 T 是否是可比较的。这是 traits 中的内容，会在下面介绍。</p><p>范型的用法</p><pre><code class=language-rust>// struct
+struct Point&lt;T&gt; {
+  x: T,
+  y: T,
+}
+
+struct Point&lt;T, U&gt; {
+    x: T,
+    y: U,
+}
+
+// enum
+enum Option&lt;T&gt; {
+  Some(T)，
+  None,
+}
+
+enum Result&lt;T, E&gt; {
+  OK(T),
+  Err(E),
+}
+
+// 方法
+
+impl&lt;T&gt; Point&lt;T&gt; {
+  fn x(&amp;self) -&gt; &amp;T {
+    &amp;self.x
+  }
+}
+
+</code></pre><p>范型不存在性能问题，rust在编译节点会收集具体的类型，然后生成对应的方法</p><h3 id=traits定义行为>traits，定义行为</h3><p>trait 为类型定义行为。不同的类型去实现</p><pre><code class=language-rust>pub trait Summary {
+  fn summarize(&amp;self) -&gt; String;
+}
+
+pub struct NewsArticle {
+  pub headline: String,
+  pub lication: String,
+  pub author: String,
+  pub content: String,
+}
+
+impl Summary for NewsArticle {
+  fn summarize(&amp;self) -&gt; String {
+    format!(&quot;{}, by {} ({})&quot;, self.headline, self.author, self.location)
+  }
+}
+
+pub struct Tweet {
+    pub username: String,
+    pub content: String,
+    pub reply: bool,
+    pub retweet: bool,
+}
+
+impl Summary for Tweet {
+    fn summarize(&amp;self) -&gt; String {
+        format!(&quot;{}: {}&quot;, self.username, self.content)
+    }
+}
+</code></pre><p>有些时候，可以提供默认实现，这样其余的类型就不需要实现了。</p><pre><code class=language-rust>pub trait Summary {
+    fn summarize(&amp;self) -&gt; String {
+        String::from(&quot;(Read more...)&quot;)
+    }
+}
+
+// 使用默认实现
+impl Summary for NewsArticle {}
+</code></pre><p>在 trait 中可以调用 trait 下面的其他方法</p><pre><code class=language-rust>pub trait Summary {
+    fn summarize_author(&amp;self) -&gt; String;
+
+    fn summarize(&amp;self) -&gt; String {
+        format!(&quot;(Read more from {}...)&quot;, self.summarize_author())
+    }
+}
+</code></pre><p>trait 作为函数参数</p><pre><code class=language-rust>pub fn notify(item: &amp;impl Summary) {
+  println!(&quot;Breaking news! {}&quot;, item.summarize());
+}
+</code></pre><p>上面的写法是语法糖，下面是另外一种写法</p><pre><code class=language-rust>pub fn notify&lt;T: Summary&gt;(item: &amp;T) {
+  println!(&quot;Breaking news! {}&quot;, item.summarize());
+}
+</code></pre><p>实现多个 trait</p><pre><code class=language-rust>
+pub fn notify(item: &amp;(impl Summary + Display)) {
+  println!(&quot;Breaking news! {}&quot;, item.summarize());
+}
+
+pub fn notify&lt;T: Summary + Display&gt;(item: &amp;T) {
+  println!(&quot;Breaking news! {}&quot;, item.summarize());
+}
+</code></pre><p>当函数参数有很多个 trait 的时候，函数签名可读性就会降低，这时候，可以使用 where</p><pre><code class=language-rust>fn some_function&lt;T: Display + Clone, U: Clone + Debug&gt;(t: &amp;T, u: &amp;U) -&gt; i32 {}
+
+fn some_function&lt;T, U&gt;(t: &amp;T, u: &amp;U) -&gt; i32
+  where T: Display + Clone,
+        U: Clone + Debug
+</code></pre><p>trait 作为返回值</p><pre><code class=language-rust>fn returns_summarizable() -&gt; impl Summary {
+  Tweet {
+
+  }
+}
+</code></pre><p>目前只能返回特定的类型,下面的代码根据 switch 的值返回不同的类型，编译会报错</p><pre><code class=language-rust>fn returns_summarizable(switch: bool) -&gt; impl Summary {
+    if switch {
+        NewsArticle {
+            headline: String::from(
+                &quot;Penguins win the Stanley Cup Championship!&quot;,
+            ),
+            location: String::from(&quot;Pittsburgh, PA, USA&quot;),
+            author: String::from(&quot;Iceburgh&quot;),
+            content: String::from(
+                &quot;The Pittsburgh Penguins once again are the best \
+                 hockey team in the NHL.&quot;,
+            ),
+        }
+    } else {
+        Tweet {
+            username: String::from(&quot;horse_ebooks&quot;),
+            content: String::from(
+                &quot;of course, as you probably already know, people&quot;,
+            ),
+            reply: false,
+            retweet: false,
+        }
+    }
+}
+
+</code></pre><p>修复 largest 函数</p><pre><code class=language-rust>fn largest&lt;T: PartialOrd + Copy&gt;(list: &amp;[T]) -&gt; T {
+    let mut largest = list[0];  // Copy trait
+
+    for &amp;item in list {
+        if item &gt; largest { // PartialOrd trait
+            largest = item;
+        }
+    }
+
+    largest
+}
+
+fn main() {
+    let number_list = vec![34, 50, 25, 100, 65];
+
+    let result = largest(&amp;number_list);
+    println!(&quot;The largest number is {}&quot;, result);
+
+    let char_list = vec!['y', 'm', 'a', 'q'];
+
+    let result = largest(&amp;char_list);
+    println!(&quot;The largest char is {}&quot;, result);
+}
+</code></pre><p>利用 trait 控制特定方法的实现</p><pre><code class=language-rust>use std::fmt::Display;
+
+struct Pair&lt;T&gt; {
+  x: T,
+  y: T,
+}
+
+impl&lt;T&gt; Pair&lt;T&gt; {
+  fn new(x: T, y: T) -&gt; Self {
+    Self{x, y}
+  }
+}
+//  只有实现 Display + PartialOrd trait 的类型才可以调用 cmp_display 方法
+impl&lt;T: Display + PartialOrd&gt; Pair&lt;T&gt; {
+  fn cmp_display(&amp;self) {
+        if self.x &gt;= self.y {
+            println!(&quot;The largest member is x = {}&quot;, self.x);
+        } else {
+            println!(&quot;The largest member is y = {}&quot;, self.y);
+        }
+    }
+}
+</code></pre><p>同理，也可以选择性的实现其余 trait 如果当前type 实现了某个 trait
+比如标准库中，为 T: Display 的类型实现了 ToString trait</p><pre><code class=language-rust>impl&lt;T: Display&gt; ToString for T {
+
+}
+</code></pre><p>所以只要实现了 Display trait 的类型都可以调用 to_string() 方法</p><h3 id=生命周期>生命周期</h3><p>使用生命周期避免 悬垂指针</p><pre><code class=language-rust>{
+  let r;
+
+  {
+    let x = 5;
+    r = &amp;x;
+  }
+  println!(&quot;r: {}&quot;, r);
+}
+</code></pre><p>上面的代码编译会报错。因为 x 会被清理，但是 r 是 x 的引用。println 时，x 已经释放了。</p><pre><code class=language-rust>fn longest(x: &amp;str, y:&amp;str) -&gt; &amp;str {
+  if x.len() &gt; y.len() {
+        x
+    } else {
+        y
+    }
+}
+</code></pre><p>上诉的 longest 编译会报错。因为无法确定到底返回的是 x 还是 y，需要加上 声明周期 标识。</p><pre><code class=language-rust>&amp;i32 // 引用
+&amp;‘a i32 // 显示的生命周期
+&amp;‘a mut i32 // 
+
+fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
+    if x.len() &gt; y.len() {
+        x
+    } else {
+        y
+    }
+}
+</code></pre><p>接下来longest函数是如何限制生命周期的</p><pre><code class=language-rust>fn main() {
+    let string1 = String::from(&quot;long string is long&quot;);
+    // string1 声明周期大于 string2，代码正常运行
+    {
+        let string2 = String::from(&quot;xyz&quot;);
+        let result = longest(string1.as_str(), string2.as_str());
+        println!(&quot;The longest string is {}&quot;, result);
+    }
+}
+// result 可能是 string2 的引用，print时， string2已经回收了
+fn main() {
+    let string1 = String::from(&quot;long string is long&quot;);
+    let result;
+    {
+        let string2 = String::from(&quot;xyz&quot;);
+        result = longest(string1.as_str(), string2.as_str());
+    }
+    println!(&quot;The longest string is {}&quot;, result);
+}
+</code></pre><p>声明周期注解的其他用法</p><pre><code class=language-rust>// 结构体
+struct ImportantExcerpt&lt;'a&gt; {
+  part: &amp;'a str;
+}
+// 方法
+impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
+    fn announce_and_return_part(&amp;self, announcement: &amp;str) -&gt; &amp;str {
+        println!(&quot;Attention please: {}&quot;, announcement);
+        self.part
+    }
+}
+</code></pre><p>静态生命周期 <code>'static</code>，在程序运行期间都是有效的。比如字符串字面量</p><p>范型，trait 和 生命周期</p><pre><code class=language-rust>use std::fmt::Display;
+
+fn longest_with_an_anno&lt;'a, T&gt;(
+  x: &amp;'a str,
+  y: &amp;'a str,
+  ann: T
+) -&gt; &amp;'a str
+where
+  T: Display,
+{
+  println!(&quot;Announcement! {}&quot;, ann);
+    if x.len() &gt; y.len() {
+        x
+    } else {
+        y
+    }
+}
+</code></pre></div><div class=article-footer><blockquote class=mt-2x><ul class="post-copyright list-unstyled"><li class="post-copyright-link hidden-xs"><strong>Permalink:</strong>
+<a href=https://fearlessfe.github.io/blog/2022/06/rust-traits/ title="Rust Traits" target=_blank rel=external>https://fearlessfe.github.io/blog/2022/06/rust-traits/</a></li><li class=post-copyright-license><strong>License:</strong>
+<a href=http://creativecommons.org/licenses/by/4.0/deed.zh target=_blank rel=external>CC BY 4.0 CN</a></li></ul></blockquote><div class="panel panel-default panel-badger"><div class=panel-body><figure class=media><div class=media-left><a href=https://github.com/fearlessfe target=_blank class="img-burn thumb-sm visible-lg"><img src="https://avatars.githubusercontent.com/u/21964308?v=4" class="img-rounded w-full" alt></a></div><div class=media-body><h3 class=media-heading><a href=https://github.com/fearlessfe target=_blank><span class=text-dark>pengzhen</span><small class=ml-1x>Software Engineer</small></a></h3><div>Good judgement comes from experience, and experience comes from bad judgement.</div></div></figure></div></div></div></article></div><nav class="bar bar-footer clearfix" data-stick-bottom><div class=bar-inner><ul class="pager pull-left"><li class=prev><a href=https://fearlessfe.github.io/blog/2022/06/rust-collections/ title="Rust Collections"><i class="icon icon-angle-left" aria-hidden=true></i><span>&nbsp;&nbsp;Older</span></a></li><li class=toggle-toc><a class="toggle-btn collapsed" data-toggle=collapse href=#collapseToc aria-expanded=false title=Catalogue role=button><span>[&nbsp;</span><span>Catalogue</span>
+<i class="text-collapsed icon icon-anchor"></i>
+<i class="text-in icon icon-close"></i>
+<span>]</span></a></li></ul><div class=bar-right><div class=share-component data-sites=weibo,qq,wechat,facebook,twitter data-mobile-sites=weibo,qq,qzone></div></div></div></nav></main><footer class=footer itemscope itemtype=http://schema.org/WPFooter><ul class=social-links><li><a href=https://github.com/fearlessfe target=_blank title=github data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li><li><a href=https://fearlessfe.github.io/index.xml target=_blank title=rss data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li></ul><div class=copyright>&copy;2022 -
+2022<div class=publishby>Theme by <a href=https://github.com/xiaoheiAh target=_blank>xiaoheiAh </a>base on<a href=https://github.com/xiaoheiAh/hugo-theme-pure target=_blank> pure</a>.</div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type=text/x-mathjax-config>
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
+</script><script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script>window.jQuery||document.write('<script src="js/jquery.min.js"><\/script>')</script><script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/highlight.min.js></script>
+<script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/languages/golang.min.js defer></script>
+<script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/languages/javascript.min.js defer></script><script>hljs.configure({tabReplace:"    ",classPrefix:""}),hljs.initHighlightingOnLoad()</script>
+<script src=https://fearlessfe.github.io/blog/js/application.min.c181e6b0c036798c7731cfb85b41b44c80689fd48fee546b73d449386ce6ccfb.js></script>
+<script src=https://fearlessfe.github.io/blog/js/plugin.min.46930345227de54c034f39c80841463c3b879632feb482e9f2734d4b616ae3be.js></script>
+<script>(function(e){var t={TRANSLATION:{POSTS:"Posts",PAGES:"Pages",CATEGORIES:"Categories",TAGS:"Tags",UNTITLED:"(Untitled)"},ROOT_URL:"https://fearlessfe.github.io/blog/",CONTENT_URL:"https://fearlessfe.github.io/blog//searchindex.json "};e.INSIGHT_CONFIG=t})(window)</script><script type=text/javascript src=https://fearlessfe.github.io/blog/js/insight.min.07c7d73e2ec5e960e55f8b98577ada0bd78b36e7ef9d6dd65b85d4b1d443e7c1a1ca7cd1d98e7105db5fd72583cbc6fbb5e386062d3bf3c2568588fbb38c0c06.js defer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js></script>
+<script>tocbot.init({tocSelector:".js-toc",contentSelector:".js-toc-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0})</script></body></html>

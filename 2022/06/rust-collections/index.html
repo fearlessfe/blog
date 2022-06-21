@@ -1,0 +1,171 @@
+<!doctype html><html lang=en><head><title>Rust Collections - fearlessfe's blog</title><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui"><meta name=renderer content="webkit"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="black"><meta name=format-detection content="telephone=no,email=no,adress=no"><meta name=theme-color content="#000000"><meta http-equiv=window-target content="_top"><meta name=description content="常用集合 vector： 向量 string: 字符串 hash map vector 初始化向量 // 未赋值，必须显示的制定类型 let v: Vec&amp;lt;i32&amp;gt; = Vec::new(); // 如果需要初始化并赋值，可以使用 vec! 宏 // rust会自动"><meta name=generator content="Hugo 0.101.0 with theme pure"><title>Rust Collections - fearlessfe's blog</title><link rel=stylesheet href=https://fearlessfe.github.io/blog/css/style.min.e64d754037c0ee0ec4e20ab1d6f07740ace61729bc03850559b8caa21ae4a597.css><link rel=stylesheet href=https://cdn.staticfile.org/highlight.js/9.15.10/styles/github.min.css async><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css async><meta property="og:title" content="Rust Collections"><meta property="og:description" content="常用集合 vector： 向量 string: 字符串 hash map vector 初始化向量 // 未赋值，必须显示的制定类型 let v: Vec<i32> = Vec::new(); // 如果需要初始化并赋值，可以使用 vec! 宏 // rust会自动"><meta property="og:type" content="article"><meta property="og:url" content="https://fearlessfe.github.io/blog/2022/06/rust-collections/"><meta property="article:section" content="posts"><meta property="article:published_time" content="2022-06-16T23:09:25+08:00"><meta property="article:modified_time" content="2022-06-16T23:09:25+08:00"><meta itemprop=name content="Rust Collections"><meta itemprop=description content="常用集合 vector： 向量 string: 字符串 hash map vector 初始化向量 // 未赋值，必须显示的制定类型 let v: Vec<i32> = Vec::new(); // 如果需要初始化并赋值，可以使用 vec! 宏 // rust会自动"><meta itemprop=datePublished content="2022-06-16T23:09:25+08:00"><meta itemprop=dateModified content="2022-06-16T23:09:25+08:00"><meta itemprop=wordCount content="867"><meta itemprop=keywords content><meta name=twitter:card content="summary"><meta name=twitter:title content="Rust Collections"><meta name=twitter:description content="常用集合 vector： 向量 string: 字符串 hash map vector 初始化向量 // 未赋值，必须显示的制定类型 let v: Vec<i32> = Vec::new(); // 如果需要初始化并赋值，可以使用 vec! 宏 // rust会自动"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body class="main-center theme-black" itemscope itemtype=http://schema.org/WebPage><header class=header itemscope itemtype=http://schema.org/WPHeader><div class=slimContent><div class=navbar-header><div class="profile-block text-center"><a id=avatar href=https://github.com/fearlessfe target=_blank><img class="img-circle img-rotate" src="https://avatars.githubusercontent.com/u/21964308?v=4" width=200 height=200></a><h2 id=name class="hidden-xs hidden-sm">pengzhen</h2><h3 id=title class="hidden-xs hidden-sm hidden-md">Software Engineer</h3><small id=location class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i>Wuhan, China</small></div><div class=search id=search-form-wrap><form class="search-form sidebar-form"><div class=input-group><input type=text class="search-form-input form-control" placeholder=Search>
+<span class=input-group-btn><button type=submit class="search-form-submit btn btn-flat" onclick=return!1><i class="icon icon-search"></i></button></span></div><div class=ins-search><div class=ins-search-mask></div><div class=ins-search-container><div class=ins-input-wrapper><input type=text class=ins-search-input placeholder="Type something..." x-webkit-speech>
+<button type=button class="close ins-close ins-selectable" data-dismiss=modal aria-label=Close><span aria-hidden=true>×</span></button></div><div class=ins-section-wrapper><div class=ins-section-container></div></div></div></div></form></div><button class="navbar-toggle collapsed" type=button data-toggle=collapse data-target=#main-navbar aria-controls=main-navbar aria-expanded=false>
+<span class=sr-only>Toggle navigation</span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span></button></div><nav id=main-navbar class="collapse navbar-collapse" itemscope itemtype=http://schema.org/SiteNavigationElement role=navigation><ul class="nav navbar-nav main-nav"><li class="menu-item menu-item-home"><a href=/blog/><i class="icon icon-home-fill"></i>
+<span class=menu-title>Home</span></a></li><li class="menu-item menu-item-archives"><a href=/blog/posts/><i class="icon icon-archives-fill"></i>
+<span class=menu-title>Archives</span></a></li><li class="menu-item menu-item-categories"><a href=/blog/categories/><i class="icon icon-folder"></i>
+<span class=menu-title>Categories</span></a></li><li class="menu-item menu-item-tags"><a href=/blog/tags/><i class="icon icon-tags"></i>
+<span class=menu-title>Tags</span></a></li></ul></nav></div></header><aside class=sidebar itemscope itemtype=http://schema.org/WPSideBar><div class=slimContent><div class=widget><h3 class=widget-title>Board</h3><div class=widget-body><div id=board><div class=content><p>enjoy~</p></div></div></div></div><div class=widget><h3 class=widget-title>Tags</h3><div id=tag-cloud-list class=widget-body></div><script>document.onreadystatechange=()=>{document.readyState==="complete"&&tagCloud("#tag-cloud-list a",8,20)};function tagCloud(e,t,n){let o=0,s=0;$(e).each(function(){let e=Number($(this).attr("rel"));o<e&&(o=e),(s>e||s==0)&&(s=e)});let i=(n-t)/(o-s);$(e).each(function(){let e=$(this).attr("rel")-s;$(this).css({"font-size":t+e*i+"px"})})}</script></div><div class=widget><h3 class=widget-title>Categories</h3><div class=widget-body><ul class=category-list></ul></div></div><div class=widget><h3 class=widget-title>Tags</h3><div class=widget-body><ul class=tag-list></ul></div></div><div class=widget><h3 class=widget-title>Recent Posts</h3><div class=widget-body><ul class="recent-post-list list-unstyled no-thumbnail"><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-traits/ class=title>Rust Traits</a></p><p class=item-date><time datetime="2022-06-17 15:36:40 +0800 +0800" itemprop=datePublished>2022-06-17</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-collections/ class=title>Rust Collections</a></p><p class=item-date><time datetime="2022-06-16 23:09:25 +0800 +0800" itemprop=datePublished>2022-06-16</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-struct/ class=title>Rust Struct</a></p><p class=item-date><time datetime="2022-06-16 17:19:16 +0800 +0800" itemprop=datePublished>2022-06-16</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-ownership/ class=title>Rust Ownership</a></p><p class=item-date><time datetime="2022-06-16 14:35:42 +0800 +0800" itemprop=datePublished>2022-06-16</time></p></div></li><li><div class=item-inner><p class=item-title><a href=https://fearlessfe.github.io/blog/2022/06/rust-basic/ class=title>Rust Basic</a></p><p class=item-date><time datetime="2022-06-15 20:21:04 +0800 +0800" itemprop=datePublished>2022-06-15</time></p></div></li></ul></div></div></div></aside><aside class="sidebar sidebar-toc collapse" id=collapseToc itemscope itemtype=http://schema.org/WPSideBar><div class=slimContent><h4 class=toc-title>Catalogue</h4><nav id=toc class="js-toc toc"></nav></div></aside><main class=main role=main><div class=content><article id=- class="article article-type-" itemscope itemtype=http://schema.org/BlogPosting><div class=article-header><h1 itemprop=name><a class=article-title href=/blog/2022/06/rust-collections/>Rust Collections</a></h1><div class=article-meta><span class=article-date><i class="icon icon-calendar-check"></i>&nbsp;
+<a href=https://fearlessfe.github.io/blog/2022/06/rust-collections/ class=article-date><time datetime="2022-06-16 23:09:25 +0800 +0800" itemprop=datePublished>2022-06-16</time></a></span>
+<span class="post-wordcount hidden-xs" itemprop=wordCount>Word Count: 867 words</span>
+<span class="post-readcount hidden-xs" itemprop=timeRequired>Read Time: 2 minutes</span></div></div><div class="article-entry marked-body js-toc-content" itemprop=articleBody><h2 id=常用集合>常用集合</h2><ul><li>vector： 向量</li><li>string: 字符串</li><li>hash map</li></ul><h3 id=vector>vector</h3><p>初始化向量</p><pre><code class=language-rust>// 未赋值，必须显示的制定类型
+let v: Vec&lt;i32&gt; = Vec::new();
+
+// 如果需要初始化并赋值，可以使用 vec! 宏
+// rust会自动推断类型，默认为 i32
+let v = vec![1,2,3]
+</code></pre><p>更新向量</p><pre><code class=language-rust>// 未赋值，必须显示的制定类型
+let v: Vec&lt;i32&gt; = Vec::new();
+
+v.push(2)
+// 当 v 的作用域结束后，vec会自动释放
+</code></pre><p>读取向量中的元素</p><pre><code class=language-rust>let v = vec![1,2,3,4,5];
+
+let third: &amp;i32 = &amp;v[2];
+println!(&quot;The third element is {}&quot;, third);
+// get 方法返回的是 Option&lt;&amp;T&gt;
+match v.get(2) {
+  Some(third) =&gt; println!(&quot;The third element is {}&quot;, third),
+  None =&gt; println!(&quot;There is no third element.&quot;),
+}
+</code></pre><p>向量所有权.下面的代码会报错。
+first 是第一个元素的不可变引用，当向 vec 中push 元素时，可能会引起扩容，导致
+first 引用错误的内存地址。所以下面的代码无法编译通过。</p><pre><code class=language-rust>    let mut v = vec![1, 2, 3, 4, 5];
+
+    let first = &amp;v[0];
+
+    v.push(6);
+
+    println!(&quot;The first element is: {}&quot;, first);
+</code></pre><p>遍历 vec</p><pre><code class=language-rust>
+let v = vec![100, 20,33];
+// 不可变引用
+for i in &amp;v {
+  println!(&quot;{}&quot;, i);
+}
+// 可变引用
+for i in &amp;mut v {
+  *i += 50;
+}
+</code></pre><p>使用 Enum 存储多个类型</p><pre><code class=language-rust>enum SpreadsheetCell {
+  Int(i32),
+  Float(f64),
+  Text(String),
+}
+
+let row = vec![
+  SpreadsheetCell::Int(3),
+  SpreadsheetCell::Text(String::from(&quot;blue&quot;)),
+  SpreadsheetCell::Float(10.12),
+];
+</code></pre><h3 id=string>String</h3><p>创建 String。String 是 utf-8 编码。</p><pre><code class=language-rust>let mut s = String::new();
+
+let data =  &quot;initial contents&quot;;
+
+let s1 = data.to_string();
+</code></pre><p>更新 string</p><pre><code class=language-rust>let mut s = String::new();
+// push_str 
+s.push_str(&quot;hello&quot;);
+
+s.push('l');
+
+let s1 = String::from(&quot;Hello &quot;);
+let s2 = String::from(&quot;world!&quot;);
+
+let s3 = s1 + &amp;s2; // s1 的所有权移到了 s3
+</code></pre><p>在标准库中， <code>+</code> 操作的签名如下。第一个参数是 self,有所有权的转移。
+直接将 s 的内容追加到 self 中。</p><pre><code class=language-rust>fn add(self, s: &amp;str) -&gt; String {}
+</code></pre><p>多个字符串拼接可以用 format! 宏.
+format! 不会拿字符串的所有权</p><pre><code class=language-rust>    let s1 = String::from(&quot;tic&quot;);
+    let s2 = String::from(&quot;tac&quot;);
+    let s3 = String::from(&quot;toe&quot;);
+
+    let s = format!(&quot;{}-{}-{}&quot;, s1, s2, s3);
+</code></pre><p>字符串索引。我们不能直接通过下标获取字符串中的某个字符
+以下语句是非法的。</p><pre><code class=language-rust>let s1 = String::from(&quot;hello&quot;);
+let h = s1[0];
+let h = &amp;s1[..][0];
+</code></pre><p>遍历字符串. chars() 和 bytes().</p><pre><code class=language-rust>    let s1 = String::from(&quot;hello&quot;);
+    for c in s1.chars() {
+        println!(&quot;{}&quot;,c );
+    }
+
+    for b in s1.bytes() {
+        println!(&quot;{}&quot;,b );
+    }
+</code></pre><h3 id=hash-map>Hash Map</h3><p>新建 Hash Map</p><pre><code class=language-rust>use std::collections::HashMap;
+
+let mut scores = HashMap.new();
+
+scores.insert(String::from(&quot;blue&quot;),10);
+
+scores.insert(String::from(&quot;yellow&quot;),50);
+
+// keys 和 values 构建 map
+
+let keys = vec![String::from(&quot;blue&quot;), String::from(&quot;yellow&quot;)];
+let values = vec![10, 50];
+
+let mut map: HashMap&lt;_, _&gt; = keys.into_iter().zip(values.into_iter()).collect();
+</code></pre><p>插入的key和value会根据语义转移所有权</p><p>map 的值也可以是引用，这样值的所有权不回转移。但是要注意生命周期，在map有限期间都能访问
+到引用的值。</p><pre><code class=language-rust>use std::collections::HashMap;
+
+let mut map = HashMap.new();
+
+let field_name = String::from(&quot;Favorite color&quot;);
+let field_value = 32;
+// field_name 所有权转移，field_value是 copy
+map.insert(field_name, field_value);
+
+let value = map.get(&amp;field_name); // value 是 Some(&amp;T) 类型
+
+for (key, value) in &amp;map {
+  println!(&quot;{}: {}&quot;, key, value);
+}
+</code></pre><p>更新hash map</p><pre><code class=language-rust>use std::collections::HashMap;
+
+let mut map = HashMap.new();
+
+let field_name = String::from(&quot;Favorite color&quot;);
+let field_value = 32;
+// field_name 所有权转移，field_value是 copy
+map.insert(field_name, field_value);
+// 覆盖原来的值
+map.insert(String::from(&quot;Favorite color&quot;), 10);
+map.insert(String::from(&quot;Blue&quot;), 25);
+
+// 判断key是否存在，不存在则设置新的值,存在则忽略
+// entry 返回的是值的可变引用
+map.entry(String::from(&quot;Favorite color&quot;)).or_insert(50);
+
+// 在原值的基础上操作
+
+let value = map.entry(String::from(&quot;Favorite color&quot;)).or_insert(50);
+*value += 1;
+</code></pre></div><div class=article-footer><blockquote class=mt-2x><ul class="post-copyright list-unstyled"><li class="post-copyright-link hidden-xs"><strong>Permalink:</strong>
+<a href=https://fearlessfe.github.io/blog/2022/06/rust-collections/ title="Rust Collections" target=_blank rel=external>https://fearlessfe.github.io/blog/2022/06/rust-collections/</a></li><li class=post-copyright-license><strong>License:</strong>
+<a href=http://creativecommons.org/licenses/by/4.0/deed.zh target=_blank rel=external>CC BY 4.0 CN</a></li></ul></blockquote><div class="panel panel-default panel-badger"><div class=panel-body><figure class=media><div class=media-left><a href=https://github.com/fearlessfe target=_blank class="img-burn thumb-sm visible-lg"><img src="https://avatars.githubusercontent.com/u/21964308?v=4" class="img-rounded w-full" alt></a></div><div class=media-body><h3 class=media-heading><a href=https://github.com/fearlessfe target=_blank><span class=text-dark>pengzhen</span><small class=ml-1x>Software Engineer</small></a></h3><div>Good judgement comes from experience, and experience comes from bad judgement.</div></div></figure></div></div></div></article></div><nav class="bar bar-footer clearfix" data-stick-bottom><div class=bar-inner><ul class="pager pull-left"><li class=prev><a href=https://fearlessfe.github.io/blog/2022/06/rust-struct/ title="Rust Struct"><i class="icon icon-angle-left" aria-hidden=true></i><span>&nbsp;&nbsp;Older</span></a></li><li class=next><a href=https://fearlessfe.github.io/blog/2022/06/rust-traits/ title="Rust Traits"><span>Newer&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden=true></i></a></li><li class=toggle-toc><a class="toggle-btn collapsed" data-toggle=collapse href=#collapseToc aria-expanded=false title=Catalogue role=button><span>[&nbsp;</span><span>Catalogue</span>
+<i class="text-collapsed icon icon-anchor"></i>
+<i class="text-in icon icon-close"></i>
+<span>]</span></a></li></ul><div class=bar-right><div class=share-component data-sites=weibo,qq,wechat,facebook,twitter data-mobile-sites=weibo,qq,qzone></div></div></div></nav></main><footer class=footer itemscope itemtype=http://schema.org/WPFooter><ul class=social-links><li><a href=https://github.com/fearlessfe target=_blank title=github data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li><li><a href=https://fearlessfe.github.io/index.xml target=_blank title=rss data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li></ul><div class=copyright>&copy;2022 -
+2022<div class=publishby>Theme by <a href=https://github.com/xiaoheiAh target=_blank>xiaoheiAh </a>base on<a href=https://github.com/xiaoheiAh/hugo-theme-pure target=_blank> pure</a>.</div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_SVG"></script>
+<script type=text/x-mathjax-config>
+    MathJax.Hub.Config({
+            showMathMenu: false, //disables context menu
+            tex2jax: {
+            inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+           }
+    });
+</script><script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script>window.jQuery||document.write('<script src="js/jquery.min.js"><\/script>')</script><script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/highlight.min.js></script>
+<script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/languages/golang.min.js defer></script>
+<script type=text/javascript src=https://cdn.staticfile.org/highlight.js/9.15.10/languages/javascript.min.js defer></script><script>hljs.configure({tabReplace:"    ",classPrefix:""}),hljs.initHighlightingOnLoad()</script>
+<script src=https://fearlessfe.github.io/blog/js/application.min.c181e6b0c036798c7731cfb85b41b44c80689fd48fee546b73d449386ce6ccfb.js></script>
+<script src=https://fearlessfe.github.io/blog/js/plugin.min.46930345227de54c034f39c80841463c3b879632feb482e9f2734d4b616ae3be.js></script>
+<script>(function(e){var t={TRANSLATION:{POSTS:"Posts",PAGES:"Pages",CATEGORIES:"Categories",TAGS:"Tags",UNTITLED:"(Untitled)"},ROOT_URL:"https://fearlessfe.github.io/blog/",CONTENT_URL:"https://fearlessfe.github.io/blog//searchindex.json "};e.INSIGHT_CONFIG=t})(window)</script><script type=text/javascript src=https://fearlessfe.github.io/blog/js/insight.min.07c7d73e2ec5e960e55f8b98577ada0bd78b36e7ef9d6dd65b85d4b1d443e7c1a1ca7cd1d98e7105db5fd72583cbc6fbb5e386062d3bf3c2568588fbb38c0c06.js defer></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js></script>
+<script>tocbot.init({tocSelector:".js-toc",contentSelector:".js-toc-content",headingSelector:"h1, h2, h3",hasInnerContainers:!0})</script></body></html>
